@@ -10,8 +10,8 @@
  
  model Transaction {
    id        String   @id @unique @default(uuid())
-   idDebit   String   @unique
-   idCredit  String   @unique
+   idDebit   String   
+   idCredit  String   
    typeId    Int
    value     Float
    status    Status   @default(PENDING)

@@ -13,11 +13,9 @@ CREATE TYPE "Status" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
      CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
  );
  
- -- CreateIndex
+
  CREATE UNIQUE INDEX "Transaction_id_key" ON "Transaction"("id");
  
- -- CreateIndex
- CREATE UNIQUE INDEX "Transaction_idDebit_key" ON "Transaction"("idDebit");
+ CREATE INDEX "Transaction_idDebit_index" ON "Transaction"("idDebit");
  
- -- CreateIndex
- CREATE UNIQUE INDEX "Transaction_idCredit_key" ON "Transaction"("idCredit");
+ CREATE INDEX "Transaction_idCredit_index" ON "Transaction"("idCredit");
