@@ -40,4 +40,17 @@ export class GenericService<T extends keyof PrismaClient> {
             return { success: false, error: err.message };
         }
     }
+
+    async update(id: string, data: any) {
+        try {
+            const updatedRecord = await (this.model as any).update({
+                where: { id },
+                data,
+            });
+
+            return { success: true, data: updatedRecord };
+        } catch (err: any) {
+            return { success: false, error: err.message };
+        }
+    }
 }

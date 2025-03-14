@@ -11,11 +11,11 @@ export class TransactionPrimaRepository implements TransactionRepository {
         this.genericService = new GenericService('transaction');
     }
 
-    async saveTransaction(params: { 
-        accountExternalIdDebit: string; 
-        accountExternalIdCredit: string; 
-        tranferTypeId: number; 
-        value: number; 
+    async saveTransaction(params: {
+        accountExternalIdDebit: string;
+        accountExternalIdCredit: string;
+        tranferTypeId: number;
+        value: number;
     }): Promise<Transaction> {
         try {
             const newTransaction = await this.genericService.insert({
@@ -54,4 +54,19 @@ export class TransactionPrimaRepository implements TransactionRepository {
             throw new Error(`Error al obtener transacciones: ${error.message}`);
         }
     }
+
+    async updateTransactionStatus(transactionId: string, status: string): Promise<void> {
+        try {
+            const result = await this.genericService.update(transactionId, { status });
+
+            if (!result.success) {
+                throw new Error(`Error al actualizar la transacción: ${result.error}`);
+            }
+
+            console.log('Transacción actualizada con éxito:', result.data);
+        } catch (error: any) {
+            throw new Error(`Error al actualizar el estado de la transacción: ${error.message}`);
+        }
+    }
+
 }

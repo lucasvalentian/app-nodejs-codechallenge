@@ -1,15 +1,23 @@
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Kafka } from 'kafkajs';
 
-const kafka = new Kafka({
-    clientId: 'transaction-service',
-    brokers: ['localhost:9092'],
-});
+@Injectable()
+export class TransactionProducer implements OnModuleInit {
+    private kafka = new Kafka({
+        clientId: 'transaction-service',
+        brokers: ['localhost:9092'],
+    });
 
-export const kafkaProducer = kafka.producer();
-export const kafkaConsumer = kafka.consumer({ groupId: 'transaction-group' });
+    private producer = this.kafka.producer();
 
-export async function connectKafka() {
-    await kafkaProducer.connect();
-    await kafkaConsumer.connect();
-    console.log("Conectado a Kafka");
+    async onModuleInit() {
+        await this.producer.connect();
+    }
+
+    async sendTransactionCreated(transaction: any) {
+        await this.producer.send({
+            topic: 'transaction-created',
+            messages: [{ value: JSON.stringify(transaction) }],
+        });
+    }
 }

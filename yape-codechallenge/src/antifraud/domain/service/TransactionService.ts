@@ -11,4 +11,8 @@ export class TransactionDomianService {
     async saveTransaction(params: { accountExternalIdDebit: string, accountExternalIdCredit: string, tranferTypeId: number, value: number }): Promise<Transaction> {
         return this.transactionRepository.saveTransaction(params);
     }
+
+    async updateTransactionStatus(transactionId: string, status: string): Promise<void> {
+        return this.transactionRepository.updateTransactionStatus(transactionId, status);
+    }
 }
