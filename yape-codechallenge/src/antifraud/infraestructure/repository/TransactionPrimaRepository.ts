@@ -2,13 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { GenericService } from '../../../common/db/methods/ConnectionPostgres';
 import { TransactionRepository } from '../../domain/repository/TransactionRepository';
 import { Transaction } from 'src/antifraud/domain/entities/Transaction';
+import { TransactionResult } from 'src/antifraud/domain/interface/TransactionResult';
+import { GenericRedisService } from '../../../common/redis/GenericRedisService';
+import { MapperAffiliatePhotoSupport } from '../support/MapperTransaction';
 
 @Injectable()
 export class TransactionPrimaRepository implements TransactionRepository {
     private genericService: GenericService<'transaction'>;
+    private redisService: GenericRedisService;
 
     constructor() {
         this.genericService = new GenericService('transaction');
+        this.redisService = new GenericRedisService();
     }
 
     async saveTransaction(params: {
@@ -36,8 +41,15 @@ export class TransactionPrimaRepository implements TransactionRepository {
         }
     }
 
-    async getTransactionByAccountExternalId(accountExternalId: string): Promise<Transaction[]> {
+    async getTransactionByAccountExternalId(accountExternalId: string): Promise<TransactionResult[]> {
+
         try {
+            const cachedTransactions = await this.redisService.get(accountExternalId);
+
+            if (cachedTransactions.success && cachedTransactions.data) {
+                return MapperAffiliatePhotoSupport.mapGetTransactionResult(cachedTransactions.data);
+            }
+
             const transactions = await this.genericService.scan({
                 OR: [
                     { idDebit: accountExternalId },
@@ -49,7 +61,7 @@ export class TransactionPrimaRepository implements TransactionRepository {
                 throw new Error(transactions.error);
             }
 
-            return transactions.data;
+            return MapperAffiliatePhotoSupport.mapGetTransactionResult(transactions.data);
         } catch (error: any) {
             throw new Error(`Error al obtener transacciones: ${error.message}`);
         }

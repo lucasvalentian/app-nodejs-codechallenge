@@ -1,6 +1,7 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Transaction } from '../entities/Transaction';
 import { TransactionRepository } from '../repository/TransactionRepository';
+import { TransactionResult } from '../interface/TransactionResult';
 
 @Injectable()
 export class TransactionDomianService {
@@ -14,5 +15,10 @@ export class TransactionDomianService {
 
     async updateTransactionStatus(transactionId: string, status: string): Promise<void> {
         return this.transactionRepository.updateTransactionStatus(transactionId, status);
+    }
+
+    async getTransaction(params:{transactionId: string}): Promise<TransactionResult[]> {
+        const transactionId = params.transactionId;
+        return this.transactionRepository.getTransactionByAccountExternalId(transactionId);
     }
 }

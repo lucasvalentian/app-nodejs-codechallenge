@@ -6,6 +6,8 @@ import { TransactionProducer } from '../../infraestructure/kafka/TransactionProd
 import { TransactionDomianService } from '../../domain/service/TransactionService';
 import { TransactionRequest } from '../dto/request/TransactionRequest';
 import { TransactionResponse } from '../dto/response/TransactionResponse';
+import { GetTransactionResponse } from '../dto/response/GetTransactionResponse';
+import { GetTransactionRequest } from '../dto/request/GetTransactionRequest';
 
 @Injectable()
 export class TransactionAplicationService {
@@ -21,6 +23,29 @@ export class TransactionAplicationService {
             });
 
             await this.transactionProducer.sendTransactionCreatedEvent(response);
+
+            return {
+                code: HttpConstants.OK.CODE,
+                message: HttpConstants.OK.MESSAGE,
+                data: response
+            };
+
+        } catch (exception) {
+            throw new CustomException({
+                code: exception.code,
+                message: EXCEPTION_MESSAGES.COULD_NOT_COMPLETE,
+                httpStatus: exception.httpCode,
+                details: exception.message,
+                exception
+            });
+        }
+    }
+
+    async getTransaction(transactionId: GetTransactionRequest): Promise<GetTransactionResponse> {
+        try {
+            const response = await this.transactionDomainService.getTransaction({
+                transactionId: transactionId.transactionId
+            });
 
             return {
                 code: HttpConstants.OK.CODE,
