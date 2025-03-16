@@ -58,13 +58,15 @@ services:
       - "3000:3000"
     env_file:
       - ./transaction-service/.env
+    environment:
+      - ENABLE_SWAGGER=true
     depends_on:
       - postgres
       - kafka
       - redis
     networks:
       - app_network
-    command: sh -c "npm install && npm run test && npm start"
+    command: sh -c "npm install && npm run test && npm start && echo 'Swagger disponible en http://localhost:3000/api/docs'"
 
   antifraud-service:
     build: ./antifraud-service
