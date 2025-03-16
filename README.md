@@ -109,8 +109,6 @@ Ensure you have the following installed:
    npm install
    docker-compose up --build
    npx prisma migrate dev --name init
-   docker run --name redis -p 6379:6379 -d redis
-   npm run start
 
    API Endpoints
 
