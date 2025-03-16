@@ -2,7 +2,7 @@ import { Body, Controller, HttpException, Post, HttpCode, Get, Query } from '@ne
 import { TransactionAplicationService } from '../../application/service/TransactionService';
 import { TransactionValidation } from '../../application/validation/TransactionValidation';
 import { TransactionRequest } from '../../application/dto/request/TransactionRequest';
-import { GetTransactionRequest } from 'src/antifraud/application/dto/request/GetTransactionRequest';
+import { GetTransactionRequest } from 'src/transaction/application/dto/request/GetTransactionRequest';
 
 @Controller('transaction')
 export class TransactionController {

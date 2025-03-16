@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { GenericService } from '../../../common/db/methods/ConnectionPostgres';
 import { TransactionRepository } from '../../domain/repository/TransactionRepository';
-import { Transaction } from 'src/antifraud/domain/entities/Transaction';
-import { TransactionResult } from 'src/antifraud/domain/interface/TransactionResult';
+import { Transaction } from 'src/transaction/domain/entities/Transaction';
+import { TransactionResult } from 'src/transaction/domain/interface/TransactionResult';
 import { GenericRedisService } from '../../../common/redis/GenericRedisService';
 import { MapperAffiliatePhotoSupport } from '../support/MapperTransaction';
 

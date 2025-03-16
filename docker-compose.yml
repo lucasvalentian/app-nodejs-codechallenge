@@ -1,4 +1,5 @@
 version: "3.7"
+
 services:
   postgres:
     image: postgres:14
@@ -14,6 +15,16 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app_network
+
+  redis:
+    image: redis:7.0
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+    command: redis-server --appendonly yes
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.3
