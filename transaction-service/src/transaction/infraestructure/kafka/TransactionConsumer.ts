@@ -21,29 +21,22 @@ export class TransactionConsumer implements OnModuleInit {
         try {
             await this.consumer.connect();
             console.log('Consumer conectado a Kafka');
-            await this.consumer.subscribe({ topic: 'transaction.created', fromBeginning: false });
+            await this.consumer.subscribe({ topic: 'transaction.status-updated', fromBeginning: false });
 
             await this.consumer.run({
                 eachMessage: async ({ message }) => {
                     try {
-                        const transaction = JSON.parse(message.value.toString());
-                        console.log(`🔍 Procesando transacción: ${transaction.id}`);
+                        const { transactionId, status } = JSON.parse(message.value.toString());
 
-                        const status = transaction.value > 1000 ? 'REJECTED' : 'ACCEPTED';
-                        console.log(`🔄 Estado asignado: ${status}`);
-
-                        await this.transactionDomainService.updateTransactionStatus(transaction.id, status);
-                        console.log(`✅ Estado actualizado en la base de datos`);
-
-                        await this.transactionProducer.sendTransactionStatusUpdate(transaction.id, status);
+                        await this.transactionDomainService.updateTransactionStatus(transactionId, status);
                     } catch (error) {
-                        console.error(`❌ Error procesando mensaje: ${error.message}`);
+                        console.error(`Error procesando mensaje: ${error.message}`);
                     }
                 }
             });
         } catch (error) {
-            console.error(`❌ Error al conectar el consumer: ${error.message}`);
-            setTimeout(() => this.onModuleInit(), 5000); // Reintento cada 5 segundos
+            console.error(`Error al conectar el consumer: ${error.message}`);
+            setTimeout(() => this.onModuleInit(), 5000);
         }
     }
 }
