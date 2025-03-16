@@ -37,7 +37,8 @@ services:
   kafka:
     image: confluentinc/cp-enterprise-kafka:5.5.3
     container_name: kafka
-    depends_on: [zookeeper]
+    depends_on:
+      - zookeeper
     environment:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
@@ -47,6 +48,30 @@ services:
       KAFKA_JMX_PORT: 9991
     ports:
       - "9092:9092"
+    networks:
+      - app_network
+
+  transaction-service:
+    build: ./transaction-service
+    container_name: transaction-service
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./transaction-service/.env
+    depends_on:
+      - postgres
+      - kafka
+      - redis
+    networks:
+      - app_network
+
+  antifraud-service:
+    build: ./antifraud-service
+    container_name: antifraud-service
+    env_file:
+      - ./antifraud-service/.env
+    depends_on:
+      - kafka
     networks:
       - app_network
 
