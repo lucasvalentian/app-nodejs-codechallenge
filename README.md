@@ -106,7 +106,6 @@ Ensure you have the following installed:
    https://github.com/lucasvalentian/app-nodejs-codechallenge.git
    cd yape-codechallenge
 
-   npm install
    docker-compose up --build
    npx prisma migrate dev --name init
 
