@@ -64,6 +64,7 @@ services:
       - redis
     networks:
       - app_network
+    command: sh -c "npm install && npm run test && npm start"
 
   antifraud-service:
     build: ./antifraud-service
@@ -74,6 +75,7 @@ services:
       - kafka
     networks:
       - app_network
+    command: sh -c "npm install && npm run test && npm start"
 
 networks:
   app_network:
