@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Transaction, TransactionStatus } from '../../domain/entity/transactionEntity';
-import { KafkaProducerService } from '../../infrastructure/kafka/kafkaProducerService';
+import { KafkaProducerService } from 'antifraud/infrastructure/kafka/KafkaProducerService';
 
 @Injectable()
 export class ValidateTransactionUseCase {

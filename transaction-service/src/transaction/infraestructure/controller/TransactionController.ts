@@ -18,6 +18,7 @@ export class TransactionController {
     @ApiResponse({ status: 400, description: 'Solicitud inválida' })
     @ApiBody({ type: TransactionRequest })
     async saveTransaction(@Body() transaction: any) {
+        console.log("🚀 ~ TransactionController ~ saveTransaction ~ transaction:", transaction)
         try {
 
             await this.transactionValidation.validateTransaction(transaction as TransactionRequest);

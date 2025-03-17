@@ -5,7 +5,10 @@ import { KafkaProducer } from './antifraud/infrastructure/kafka/kafkaProducer';
 import { TransactionRepository } from './antifraud/infrastructure/repository/transactionRepository';
 import { kafkaConfig } from './common/config/kafkaConfig';
 import { ValidateTransactionUseCase } from './antifraud/application/usecases/transactionService';
-import { KafkaProducerService } from './antifraud/infrastructure/kafka/kafkaProducerService';
+import { KafkaProducerService } from 'antifraud/infrastructure/kafka/KafkaProducerService';
+
+
+
 
 @Module({
   imports: [ClientsModule.register([{ name: 'KAFKA_SERVICE', ...kafkaConfig }])],

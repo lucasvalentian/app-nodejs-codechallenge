@@ -52,6 +52,7 @@ export class TransactionPrimaRepository implements TransactionRepository {
 
             const transactions = await this.genericService.scan({
                 OR: [
+                    { id: accountExternalId },
                     { idDebit: accountExternalId },
                     { idCredit: accountExternalId }
                 ],

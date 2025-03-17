@@ -5,7 +5,7 @@ import { Kafka } from 'kafkajs';
 export class TransactionProducer implements OnModuleInit {
     private readonly kafka = new Kafka({
         clientId: 'transaction-service',
-        brokers: ['localhost:9092'],
+        brokers: ['kafka:9092'],
     });
 
     private readonly producer = this.kafka.producer();

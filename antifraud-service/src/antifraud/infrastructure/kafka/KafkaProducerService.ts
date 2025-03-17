@@ -6,7 +6,7 @@ import { TransactionStatus } from '../../domain/entity/transactionEntity';
 export class KafkaProducerService {
     private kafka = new Kafka({
         clientId: 'antifraud-service',
-        brokers: ['localhost:9092'],
+        brokers: ['kafka:9092'],
     });
 
     private producer = this.kafka.producer();

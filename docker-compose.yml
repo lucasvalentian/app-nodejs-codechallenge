@@ -8,13 +8,13 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=transactions_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: transactions_db
+    networks:
+      - prisma-network
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app_network
 
   redis:
     image: redis:7.0
@@ -23,33 +23,63 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - app_network
+      - kafka-network
     command: redis-server --appendonly yes
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.5.3
-    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:7.8.0
+    container_name: app_zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
-      - app_network
+      - kafka-network
+    ports:
+      - "2181:2181"
 
   kafka:
-    image: confluentinc/cp-enterprise-kafka:5.5.3
-    container_name: kafka
+    image: confluentinc/cp-kafka:7.8.0
+    hostname: kafka
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
+    container_name: kafka
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_JMX_PORT: 9991
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENERS: INTERNAL://:9092,OUTSIDE://:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://host.docker.internal:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "kafka:9092", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     ports:
       - "9092:9092"
+      - "9094:9094"
     networks:
-      - app_network
+      - kafka-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      DYNAMIC_CONFIG_ENABLED: "true"
+      KAFKA_CLUSTERS_0_NAME: "Local Kafka"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+    networks:
+      - kafka-network
 
   transaction-service:
     build: ./transaction-service
@@ -59,29 +89,43 @@ services:
     env_file:
       - ./transaction-service/.env
     environment:
-      - ENABLE_SWAGGER=true
+      DATABASE_HOST: postgres_db
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: transactions_db
+      DYNAMIC_CONFIG_ENABLED: "true"
+      KAFKA_CLUSTERS_0_NAME: "Local Kafka"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
     depends_on:
       - postgres
       - kafka
       - redis
     networks:
-      - app_network
-    command: sh -c "npm install && npm run test && npm start && echo 'Swagger disponible en http://localhost:3000/api/docs'"
+      - kafka-network
+      - prisma-network
+    command: sh -c "npm start && echo 'Swagger disponible en http://localhost:3000/api/docs'"
 
   antifraud-service:
     build: ./antifraud-service
     container_name: antifraud-service
     env_file:
       - ./antifraud-service/.env
+    environment:
+      DYNAMIC_CONFIG_ENABLED: "true"
+      KAFKA_CLUSTERS_0_NAME: "Local Kafka"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
     depends_on:
       - kafka
     networks:
-      - app_network
-    command: sh -c "npm install && npm run test && npm start"
+      - kafka-network
+    command: sh -c "npm start"
 
 networks:
-  app_network:
-    driver: bridge
+  prisma-network:
+    name: prisma-network
+  kafka-network:
+    name: kafka-network
 
 volumes:
   postgres_data:

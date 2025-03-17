@@ -7,7 +7,7 @@ import { TransactionDomianService } from '../../domain/service/TransactionServic
 export class TransactionConsumer implements OnModuleInit {
     private kafka = new Kafka({
         clientId: 'antifraud-service',
-        brokers: ['localhost:9092'],
+        brokers: ['kafka:9092'],
     });
 
     private consumer = this.kafka.consumer({ groupId: 'antifraud-group' });
