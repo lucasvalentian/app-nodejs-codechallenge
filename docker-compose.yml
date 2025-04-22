@@ -104,7 +104,7 @@ services:
     networks:
       - kafka-network
       - prisma-network
-    command: sh -c "npm start && echo 'Swagger disponible en http://localhost:3000/api/docs'"
+    command: sh -c "npm run db:deploy && npm start && echo 'Swagger disponible en http://localhost:3000/api/docs'"
 
   antifraud-service:
     build: ./antifraud-service
@@ -121,6 +121,28 @@ services:
       - kafka-network
     command: sh -c "npm start"
 
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - kafka-network
+  
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - kafka-network
+
 networks:
   prisma-network:
     name: prisma-network
@@ -129,3 +151,4 @@ networks:
 
 volumes:
   postgres_data:
+  grafana-storage:

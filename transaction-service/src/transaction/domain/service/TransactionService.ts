@@ -17,8 +17,14 @@ export class TransactionDomianService {
         return this.transactionRepository.updateTransactionStatus(transactionId, status);
     }
 
-    async getTransaction(params:{transactionId: string}): Promise<TransactionResult[]> {
+    async getTransaction(params: { transactionId: string }): Promise<TransactionResult[]> {
         const transactionId = params.transactionId;
         return this.transactionRepository.getTransactionByAccountExternalId(transactionId);
+    }
+    async saveFailedEvent(transactionId: string, error: string): Promise<void> {
+        await this.transactionRepository.saveFailedTransaction({
+            transactionId,
+            error
+        });
     }
 }

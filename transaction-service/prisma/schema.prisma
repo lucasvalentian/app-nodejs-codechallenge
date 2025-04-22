@@ -1,5 +1,4 @@
-
- generator client {
+generator client {
    provider = "prisma-client-js"
    binaryTargets = ["native", "debian-openssl-3.0.x"]
  }
@@ -17,6 +16,15 @@
    value     Float
    status    Status   @default(PENDING)
    createdAt DateTime @default(now())
+ }
+ 
+ model FailedEvent {
+   id            Int      @id @default(autoincrement())
+   transactionId String
+   error         String
+   timestamp     DateTime @default(now())
+
+   @@index([transactionId])
  }
  
  enum Status {

@@ -90,6 +90,24 @@ If you have any questions, please let us know.
 - **Prisma** – ORM (Object Relational Mapper) for database management and querying.
 - **Redis** – In-memory key-value store used for caching.
 - **Docker** – Platform for developing, shipping, and running applications in containers.
+- **Prometheus** – Monitoring and alerting toolkit for collecting and querying metrics.
+- **Grafana** – Visualization and analytics platform for monitoring metrics and logs.
+- **PostgreSQL** – Relational database used to store application data, including a `FailedEvent` table for auditing failed Kafka message deliveries.
+
+---
+
+### **FailedEvent Table**
+
+As part of the implementation, a `FailedEvent` table was added to the PostgreSQL database. This table is used to store audit data for messages that fail to be sent to Kafka after multiple retries. The table schema includes the following fields:
+
+- **id**: Auto-incremented primary key.
+- **transactionId**: The ID of the transaction associated with the failed message.
+- **error**: The error message describing why the message failed.
+- **timestamp**: The date and time when the failure occurred.
+
+This ensures that failed messages are logged for further analysis or reprocesamiento.
+
+---
 
 ### Prerequisites
 
@@ -99,16 +117,17 @@ Ensure you have the following installed:
 - [Docker](https://www.docker.com/)
 - [Redis](https://www.memurai.com/get-memurai)
 
+---
+
 ### Steps to Install and Run
 
 1. **Clone the repository**:
    ```bash
-   https://github.com/lucasvalentian/app-nodejs-codechallenge.git
+   git clone https://github.com/lucasvalentian/app-nodejs-codechallenge.git
    cd yape-codechallenge
 
    docker-compose up --build
-   npx prisma migrate dev --name init
-
+    
    API Endpoints
 
    curl --location 'http://localhost:3000/transaction' \
@@ -142,4 +161,13 @@ Ensure you have the following installed:
           }
       ]
     }
+
+## Accesos:
+
+- **Transaction service Swagger**: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+- **Kafka UI**: [http://localhost:8080](http://localhost:8080)
+- **Prometheus**: [http://localhost:9090](http://localhost:9090)
+- **Grafana**: [http://localhost:3001](http://localhost:3001)
+  - **Usuario**: admin
+  - **Contraseña**: admin
 

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionAplicationService } from '../../../src/transaction/application/service/TransactionService';
 import { TransactionDomianService } from '../../../src/transaction/domain/service/TransactionService';
 import { TransactionProducer } from '../../../src/transaction/infraestructure/kafka/TransactionProducer';
-import { Transaction } from 'src/transaction/domain/entities/Transaction';
+import { Transaction } from '../../../src/transaction/domain/entities/Transaction';
 
 describe('TransactionAplicationService', () => {
     let service: TransactionAplicationService;

@@ -11,7 +11,12 @@ export class TransactionValidation {
             accountExternalIdDebit: Joi.string().required(),
             accountExternalIdCredit: Joi.string().required(),
             tranferTypeId: Joi.number().required(),
-            value: Joi.number().min(0.01).required(), 
+            value: Joi.number().min(0.01).required(),
+        }).custom((value, helpers) => {
+            if (value.accountExternalIdDebit === value.accountExternalIdCredit) {
+                return helpers.error('any.invalid', { message: 'Las cuentas de débito y crédito no pueden ser iguales.' });
+            }
+            return value;
         });
 
         await validate(schema, transaction);

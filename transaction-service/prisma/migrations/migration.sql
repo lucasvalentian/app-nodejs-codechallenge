@@ -22,3 +22,14 @@ CREATE UNIQUE INDEX "Transaction_idDebit_key" ON "Transaction"("idDebit");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Transaction_idCredit_key" ON "Transaction"("idCredit");
+
+-- CreateTable
+CREATE TABLE "FailedEvent" (
+    "id" SERIAL PRIMARY KEY,
+    "transactionId" TEXT NOT NULL,
+    "error" TEXT NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateIndex
+CREATE INDEX "FailedEvent_transactionId_idx" ON "FailedEvent"("transactionId");

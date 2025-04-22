@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionDomianService } from '../../../src/transaction/domain/service/TransactionService';
 import { TransactionRepository } from '../../../src/transaction/domain/repository/TransactionRepository';
-import { Transaction } from 'src/transaction/domain/entities/Transaction';
+import { Transaction } from '../../../src/transaction/domain/entities/Transaction';
 
 describe('TransactionDomianService', () => {
     let service: TransactionDomianService;

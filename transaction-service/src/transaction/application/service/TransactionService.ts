@@ -1,4 +1,4 @@
-import {  Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import CustomException from '../../../common/application/exception/CustomException';
 import { EXCEPTION_MESSAGES } from '../../../common/application/exception/Constants';
 import { HttpConstants } from '../../../common/constants/HttpConstants';
@@ -14,30 +14,39 @@ export class TransactionAplicationService {
     constructor(private transactionDomainService: TransactionDomianService, private transactionProducer: TransactionProducer) { }
 
     async saveTransaction(transaction: TransactionRequest): Promise<TransactionResponse> {
-        try {
-            const response = await this.transactionDomainService.saveTransaction({
-                accountExternalIdDebit: transaction.accountExternalIdDebit,
-                accountExternalIdCredit: transaction.accountExternalIdCredit,
-                tranferTypeId: transaction.tranferTypeId,
-                value: transaction.value
-            });
+        let attempts = 3;
+        while (attempts > 0) {
+            try {
+                const response = await this.transactionDomainService.saveTransaction({
+                    accountExternalIdDebit: transaction.accountExternalIdDebit,
+                    accountExternalIdCredit: transaction.accountExternalIdCredit,
+                    tranferTypeId: transaction.tranferTypeId,
+                    value: transaction.value
+                });
 
-            await this.transactionProducer.sendTransactionCreatedEvent(response);
+                await this.transactionProducer.sendTransactionCreatedEvent(response);
 
-            return {
-                code: HttpConstants.OK.CODE,
-                message: HttpConstants.OK.MESSAGE,
-                data: response
-            };
+                return {
+                    code: HttpConstants.OK.CODE,
+                    message: HttpConstants.OK.MESSAGE,
+                    data: response
+                };
 
-        } catch (exception) {
-            throw new CustomException({
-                code: exception.code,
-                message: EXCEPTION_MESSAGES.COULD_NOT_COMPLETE,
-                httpStatus: exception.httpCode,
-                details: exception.message,
-                exception
-            });
+            } catch (exception) {
+                console.error(`Error al intentar guardar la transacción. Intento ${3 - attempts + 1} de 3:`, exception.message);
+                attempts--;
+                if (attempts === 0) {
+                    throw new CustomException({
+                        code: exception.code,
+                        message: EXCEPTION_MESSAGES.COULD_NOT_COMPLETE,
+                        httpStatus: exception.httpCode,
+                        details: exception.message,
+                        exception
+                    });
+                }
+                
+                console.warn(`Reintentando guardar la transacción. Intentos restantes: ${attempts}`);
+            }
         }
     }
 

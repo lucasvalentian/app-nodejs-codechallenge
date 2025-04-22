@@ -8,6 +8,9 @@ COPY . .
 
 RUN npm ci --legacy-peer-deps
 
+# Genera el cliente Prisma antes de copiar el resto del código si tu schema no cambia mucho
+RUN npx prisma generate
+
 RUN npm run build
 
 CMD ["sh", "-c", "npm run db:deploy && npm start"]

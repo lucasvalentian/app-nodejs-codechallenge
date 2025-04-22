@@ -11,6 +11,9 @@ const config: Config = {
   },
   collectCoverageFrom: ['src/**/*.(t|j)s'],
   coverageDirectory: './coverage',
+  moduleNameMapper: {
+    '^transaction/(.*)$': '<rootDir>/src/transaction/$1',
+  },
 };
 
 export default config;
