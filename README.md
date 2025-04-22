@@ -83,6 +83,9 @@ If you have any questions, please let us know.
 
 # API Documentation
 
+
+This project implements two microservices: Antifraud Service and Transaction Service, designed to validate financial transactions and manage their status through Kafka events. It includes monitoring with Prometheus and Grafana, as well as unit tests to ensure code quality.
+
 ## Technologies Used
 
 - **Node.js** – JavaScript runtime environment for building scalable and fast applications.
@@ -121,53 +124,111 @@ Ensure you have the following installed:
 
 ### Steps to Install and Run
 
-1. **Clone the repository**:
+## Ejecución del Proyecto
+
+1. **Clona el repositorio**:
    ```bash
    git clone https://github.com/lucasvalentian/app-nodejs-codechallenge.git
    cd yape-codechallenge
 
    docker-compose up --build
-    
-   API Endpoints
+   ```
 
-   curl --location 'http://localhost:3000/transaction' \
-    --header 'Content-Type: application/json' \
-    --data '{
-      "accountExternalIdDebit": "a1f4e567-b8f4-4d72-b3de-97b8e6d33a8d",
-      "accountExternalIdCredit": "d1b5f423-458b-4b2d-a6f0-16e8c999a57d",
-      "tranferTypeId": 1,
-      "value": 2000
-    }'
+## API Endpoints
 
-    Get Transaction by ID
+### Crear una Transacción
+```bash
+curl --location 'http://localhost:3000/transaction' \
+--header 'Content-Type: application/json' \
+--data '{
+  "accountExternalIdDebit": "a1f4e567-b8f4-4d72-b3de-97b8e6d33a8d",
+  "accountExternalIdCredit": "d1b5f423-458b-4b2d-a6f0-16e8c999a57d",
+  "tranferTypeId": 1,
+  "value": 2000
+}'
+```
 
-    curl --location 'http://localhost:3000/transaction?transactionId=a1f4e567-b8f4-4d72-b3de-97b8e6d33a8d' \
-    --header 'Content-Type: application/json'
+### Get Transaction by ID
 
+```bash
+curl --location 'http://localhost:3000/transaction?transactionId=a1f4e567-b8f4-4d72-b3de-97b8e6d33a8d' \
+--header 'Content-Type: application/json'
+```
+
+```json
+{
+  "code": 200,
+  "message": "OK",
+  "data": [
       {
-      "code": 200,
-      "message": "OK",
-      "data": [
-          {
-              "transactionExternalId": "d6208b72-0a3f-4bf9-aaf3-b7e8758387b2",
-              "transactionType": {
-                  "name": "TRANSFER"
-              },
-              "transactionStatus": {
-                  "name": "REJECTED"
-              },
-              "value": 2000,
-              "createdAt": "2025-03-15T00:32:20.426Z"
-          }
-      ]
-    }
+          "transactionExternalId": "d6208b72-0a3f-4bf9-aaf3-b7e8758387b2",
+          "transactionType": {
+              "name": "TRANSFER"
+          },
+          "transactionStatus": {
+              "name": "REJECTED"
+          },
+          "value": 2000,
+          "createdAt": "2025-03-15T00:32:20.426Z"
+      }
+  ]
+}
+```
 
-## Accesos:
+## Access
 
-- **Transaction service Swagger**: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
-- **Kafka UI**: [http://localhost:8080](http://localhost:8080)
-- **Prometheus**: [http://localhost:9090](http://localhost:9090)
-- **Grafana**: [http://localhost:3001](http://localhost:3001)
-  - **Usuario**: admin
-  - **Contraseña**: admin
+- **Transaction service Swagger**: [http://localhost:3000/api/docs](http://localhost:3000/api/docs) - Interactive API documentation for the transaction service.
+- **Kafka UI**: [http://localhost:8080](http://localhost:8080) - Graphical interface to monitor Kafka topics and messages.
+- **Prometheus**: [http://localhost:9090](http://localhost:9090) - Tool for monitoring system metrics.
+- **Grafana**: [http://localhost:3001](http://localhost:3001) - Platform for visualizing metrics and logs.
+  - **User**: admin
+  - **Password**: admin
+
+## Pruebas Unitarias
+
+Para ejecutar las pruebas unitarias de ambos microservicios, sigue estos pasos:
+
+1. **Antifraud Service**:
+   - Navega a la carpeta del microservicio `antifraud-service`:
+     ```bash
+     cd antifraud-service
+     ```
+   - Ejecuta las pruebas unitarias:
+     ```bash
+     npm run test
+     ```
+
+2. **Transaction Service**:
+   - Navega a la carpeta del microservicio [transaction-service](http://_vscodecontentref_/2):
+     ```bash
+     cd transaction-service
+     ```
+   - Ejecuta las pruebas unitarias:
+     ```bash
+     npm run test
+     ```
+
+### **Notas**:
+- Asegúrate de que todas las dependencias estén instaladas antes de ejecutar las pruebas:
+  ```bash
+  npm install
+  ```
+
+---
+
+## Exposed Metrics
+
+- **Antifraud Service**:
+  - `antifraud_kafka_messages_sent_total`: Total number of messages successfully sent to Kafka.
+  - `antifraud_kafka_messages_failed_total`: Total number of messages that failed to send to Kafka.
+  - `antifraud_transactions_validated_total`: Total number of validated transactions.
+  - `antifraud_transactions_validation_errors_total`: Total number of errors during transaction validation.
+
+- **Transaction Service**:
+  - `transactions_created_total`: Total number of successfully created transactions.
+  - `transactions_creation_errors_total`: Total number of errors while attempting to create transactions.
+  - `transactions_retrieved_total`: Total number of retrieved transactions.
+
+---
+
 
